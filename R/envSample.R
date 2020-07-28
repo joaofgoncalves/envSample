@@ -47,14 +47,14 @@ envSample<- function (coord, filters, res, do.plot=TRUE){
     k<- filters [[i]] [!is.na(filters[[i]])]
     ext1<- range (k)
     ext1 [1]<- ext1[1]- 1
-    x<- seq(ext1[1],ext1[2], by=res[[i]])
+    x<- seq(ext1[1],ext1[2], by=res[[i]][1])
     pot_points[[i]]<- x
   }
   pot_p<- expand.grid(pot_points)
   
   ends<- NULL
   for (i in 1:n){
-    fin<- pot_p [,i] + res[[i]]
+    fin<- pot_p [,i] + res[[i]][1]
     ends<- cbind (ends, fin)
   }
   
