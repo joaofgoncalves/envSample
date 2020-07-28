@@ -1,9 +1,16 @@
-Package: pbdb
+Package: envSample
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
-Date: 2014-01-25
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Title: Filter species records using environmental variables
+Version: 0.1.1
+Date: 2020-07-28
+Author: Sara Varela [aut, cre], Joao Goncalves [aut]
+Maintainer: Joao Goncalves <joao.goncalves@cibio.up.pt>
+Description: The package contains a couple of procedures to subsample species 
+    records for niche/species models using an environmental space defined 
+    by relevant and uncorrelated variables.
+Depends: R (>= 3.1.0)
+Imports: raster, rgdal, sqldf, maps, dplyr, randomcoloR, stats, rlang, magrittr
+Suggests: testthat, roxygen2
+License: GPL-3
+Encoding: UTF-8
+RoxygenNote: 7.1.1
