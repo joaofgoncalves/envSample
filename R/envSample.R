@@ -1,11 +1,6 @@
-library (raster)
-library (rgdal)
-library (sqldf)
-library (maps)
-library (testthat)
-library (roxygen2)
 
-#' resample the raw data to eliminate the biases in the environmental space. 
+
+#' Subsample the raw data to eliminate the biases in the environmental space. 
 #' 
 #' Ecological Niche Model's predictions could be improved by using unbiased data sets 
 #' for calibrating the algorithms. 
@@ -30,13 +25,21 @@ library (roxygen2)
 #' file <- paste(system.file(package="dismo"), "/ex/bradypus.csv", sep="")
 #' bradypus <- read.table(file, header=TRUE, sep=',')
 #' coord<- bradypus [,2:3]
-#' setwd ("yourdirectory/worldclim)
+#' setwd ("yourdirectory/worldclim")
 #' var<- list.files (pattern=".bil")
 #' wc<- stack (var)
 #' data<- extract (wc, coord)
 #' data<- as.data.frame (data)
 #' envSample (coord, filters=list (data$bio1, data$bio12), res=list (20, 200), do.plot=TRUE)
 #' }
+#' 
+#' @importFrom sqldf sqldf
+#' @importFrom maps map
+#' @importFrom graphics par 
+#' @importFrom graphics points
+#' @importFrom stats complete.cases
+#' 
+#' @export
 #' 
 
 envSample<- function (coord, filters, res, do.plot=TRUE){
@@ -78,34 +81,38 @@ envSample<- function (coord, filters, res, do.plot=TRUE){
   names (real_p)<- names_real
   names (pot_pp)<- c(names_pot_st, names_pot_end, "groupID")
   
-  conditions<- paste ("(real_p.filter", 1, "<= pot_pp.end_f", 1,") and (real_p.filter", 1, "> pot_pp.start_f", 1, ")", sep="")
+  conditions<- paste ("(real_p.filter", 1, "<= pot_pp.end_f", 1,
+                      ") and (real_p.filter", 1, 
+                      "> pot_pp.start_f", 1, ")", sep="")
+  
   for (i in 2:n){
     conditions<- paste (conditions, 
-                        paste ("(real_p.filter", i, "<= pot_pp.end_f", i,") and (real_p.filter", i, "> pot_pp.start_f", i, ")", sep=""), 
+                        paste ("(real_p.filter", i, "<= pot_pp.end_f", i,
+                               ") and (real_p.filter", i, "> pot_pp.start_f", i, 
+                               ")", sep=""), 
                         sep="and")
   }
   
-  selection_NA<- sqldf(paste ("select real_p.lon, real_p.lat, pot_pp.groupID",   
+  selection_NA<- sqldf::sqldf(paste ("select real_p.lon, real_p.lat, pot_pp.groupID",   
                         sql1, "from pot_pp left join real_p on", conditions, sep=" "))
 
-  selection<- selection_NA [complete.cases(selection_NA),]
+  selection<- selection_NA [stats::complete.cases(selection_NA),]
   
   final_points<- selection[!duplicated(selection$groupID), ]
   coord_filter<- data.frame (final_points$lon, final_points$lat) 
   names (coord_filter)<- c("lon", "lat")
   
   if (do.plot==TRUE){
-    par (mfrow=c(1,2), mar=c(4,4,0,0.5))
-  plot (filters[[1]], filters[[2]], pch=19, 
+    graphics::par (mfrow=c(1,2), mar=c(4,4,0,0.5))
+    plot (filters[[1]], filters[[2]], pch=19, 
         col="grey50", xlab="Filter 1", ylab="Filter 2")
-  points (final_points$filter1, final_points$filter2, 
+    graphics::points (final_points$filter1, final_points$filter2, 
           pch=19, col="#88000090")
-  plot (coord, pch=19, col="grey50")
-  map(add=T)
-  points (coord_filter, pch=19, col="#88000090")
-  
+    plot (coord, pch=19, col="grey50")
+    maps::map(add=T)
+    graphics::points (coord_filter, pch=19, col="#88000090")
   }
-  coord_filter
+  return(coord_filter)
 }
 
 
