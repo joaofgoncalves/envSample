@@ -1,5 +1,8 @@
 # test for envSample in dismo
 
+library(envSample)
+library(sqldf)
+
 context("envSample")
 
 test_that("test if envSample filter the data as expected", {
